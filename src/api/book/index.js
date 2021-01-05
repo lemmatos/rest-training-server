@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
-import { create, index, show, update, destroy } from './controller'
+import { create, index, show, update, destroy, lend } from './controller'
 import { schema } from './model'
 export Book, { schema }
 from './model'
@@ -83,5 +83,26 @@ router.put('/:id',
  */
 router.delete('/:id',
     destroy)
+
+/**
+ * @api {post} /books Create book
+ * @apiName CreateBook
+ * @apiGroup Book
+ * @apiParam title Book's title.
+ * @apiParam author Book's author.
+ * @apiParam year Book's year.
+ * @apiParam isbn Book's isbn.
+ * @apiSuccess {Object} book Book's data.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 404 Book not found.
+ */
+router.post('/:id/lend',
+    body({
+        start_date: {
+            type: Date
+        },
+
+    }),
+    lend)
 
 export default router
