@@ -1,4 +1,6 @@
 import mongoose, { Schema } from 'mongoose'
+import { available, availableSoon } from './controller'
+
 
 const bookSchema = new Schema({
     title: {
@@ -41,8 +43,48 @@ bookSchema.methods = {
             ...view
             // add properties for a full view
         } : view
+    },
+
+    lend(lender, dueDate) {
+        const book = this
+        const Lending = mongoose.model("Lending")
+        return Lending.createFromBook(book, lender, dueDate)
+
+    },
+
+    returnBook() {
+        const book = this
+        const Lending = mongoose.model("Lending")
+        return Lending.returnBook(book)
+    }
+
+}
+
+bookSchema.statics = {
+    available() {
+        const Book = this
+        const Lending = mongoose.model("Lending")
+        return Lending.findAllBookIdsLent()
+            .then((bookIds) => Book.find({ _id: { $nin: bookIds } }))
+
+    },
+
+    availableSoon() {
+        // Book.find({ due_date: { $lt: moment().add(7, "days").endOf("day").toDate() } })
     }
 }
+
+/** Para alterar outro modelo */
+//const Author = mongoose.model("Author")
+// return Author.find({
+//     name: "Leandro"
+// }).then((author) => {
+//     console.log(author)
+//     console.log(body)
+//     res.status(500).json({
+//         message: "not implemented yet"
+//     })
+// })
 
 const model = mongoose.model('Book', bookSchema)
 

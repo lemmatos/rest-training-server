@@ -4,6 +4,7 @@ import auth from './auth'
 import author from './author'
 import book from './book'
 import library from './library'
+import lending from './lending'
 
 const router = new Router()
 
@@ -36,5 +37,6 @@ router.use('/authors', author)
 router.use('/books', book)
 router.use('/books', book)
 router.use('/libraries', library)
+router.use('/lendings', lending)
 
 export default router

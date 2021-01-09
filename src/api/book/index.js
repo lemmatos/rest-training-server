@@ -1,8 +1,12 @@
 import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
-import { create, index, show, update, destroy, lend } from './controller'
+import { create, index, show, update, destroy, lend, returnBook, available, availableSoon } from './controller'
 import { schema } from './model'
+
+import { password as passwordAuth, master, token } from '../../services/passport'
+import mongoose, { Schema } from 'mongoose'
+
 export Book, { schema }
 from './model'
 
@@ -26,9 +30,27 @@ router.post('/',
         title,
         authors,
         year,
-        isbn
+        isbn,
     }),
     create)
+
+router.post('/:id/lend',
+    token({ required: true, roles: ['admin'] }),
+    body({
+        lender: {
+            type: Schema.ObjectId,
+            ref: 'User',
+            required: true
+        },
+        due_date: {
+            type: Date,
+        }
+    }),
+    lend)
+
+router.post('/:id/return',
+    token({ required: true, roles: ['admin'] }),
+    returnBook)
 
 /**
  * @api {get} /books Retrieve books
@@ -41,6 +63,14 @@ router.post('/',
 router.get('/',
     query(),
     index)
+
+router.get('/available', // TODO
+    query(),
+    available)
+
+router.get('/available-soon', // TODO
+    query(),
+    availableSoon)
 
 /**
  * @api {get} /books/:id Retrieve book
@@ -84,25 +114,6 @@ router.put('/:id',
 router.delete('/:id',
     destroy)
 
-/**
- * @api {post} /books Create book
- * @apiName CreateBook
- * @apiGroup Book
- * @apiParam title Book's title.
- * @apiParam author Book's author.
- * @apiParam year Book's year.
- * @apiParam isbn Book's isbn.
- * @apiSuccess {Object} book Book's data.
- * @apiError {Object} 400 Some parameters may contain invalid values.
- * @apiError 404 Book not found.
- */
-router.post('/:id/lend',
-    body({
-        start_date: {
-            type: Date
-        },
 
-    }),
-    lend)
 
 export default router

@@ -1,6 +1,7 @@
 import { success, notFound } from '../../services/response/'
 import { Book } from '.'
 
+
 export const create = ({ bodymen: { body } }, res, next) =>
     Book.create(body)
     .then((book) => book.view(true))
@@ -35,6 +36,34 @@ export const destroy = ({ params }, res, next) =>
     .then(success(res, 204))
     .catch(next)
 
-export const lend = ({ bodymen: { body } }, res, next) => {
-    console.log(body)
-}
+
+export const lend = ({ bodymen: { body }, params }, res, next) =>
+    Book.findById(params.id)
+    .then(notFound(res))
+    .then((book) => book.lend(body.lender, body.dueDate))
+    .then((lending) => lending ? lending.view(true) : null)
+    .then(success(res))
+    .catch(next)
+
+
+
+export const returnBook = ({ params }, res, next) =>
+    Book.findById(params.id)
+    .then(notFound(res))
+    .then((book) => book.returnBook())
+    .then((lending) => lending ? lending.view(true) : null)
+    .then(success(res))
+    .catch(next)
+
+
+export const available = (req, res, next) =>
+    Book.available()
+    .then(success(res))
+    .catch(next)
+
+// TODO
+export const availableSoon = ({ querymen: { query, select, cursor } }, res, next) =>
+    Book.find(query, select, cursor)
+    .then((book) => book.availableSoon())
+    .then(success(res))
+    .catch(next)
