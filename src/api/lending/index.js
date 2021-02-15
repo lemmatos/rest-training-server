@@ -8,7 +8,7 @@ import { password as passwordAuth, master, token } from '../../services/passport
 import mongoose, { Schema } from 'mongoose'
 
 export Lending, { schema }
-from './model'
+  from './model'
 
 const router = new Router()
 const { state, lender, lending_date, due_date, return_date } = schema.tree
@@ -27,10 +27,8 @@ const { state, lender, lending_date, due_date, return_date } = schema.tree
  * @apiError 404 Lending not found.
  */
 router.post('/',
-    body({ state, lender, lending_date, due_date, return_date }),
-    create)
-
-
+  body({ state, lender, lending_date, due_date, return_date }),
+  create)
 
 /**
  * @api {get} /lendings Retrieve lendings
@@ -41,10 +39,9 @@ router.post('/',
  * @apiError {Object} 400 Some parameters may contain invalid values.
  */
 router.get('/',
-    token({ required: true, roles: ['admin'] }),
-    query(),
-    index)
-
+  token({ required: true, roles: ['admin'] }),
+  query(),
+  index)
 
 /**
  * @api {get} /lendings/:id Retrieve lending
@@ -55,7 +52,7 @@ router.get('/',
  * @apiError 404 Lending not found.
  */
 router.get('/:id',
-    show)
+  show)
 
 /**
  * @api {put} /lendings/:id Update lending
@@ -71,8 +68,8 @@ router.get('/:id',
  * @apiError 404 Lending not found.
  */
 router.put('/:id',
-    body({ state, lender, lending_date, due_date, return_date }),
-    update)
+  body({ state, lender, lending_date, due_date, return_date }),
+  update)
 
 /**
  * @api {delete} /lendings/:id Delete lending
@@ -82,6 +79,6 @@ router.put('/:id',
  * @apiError 404 Lending not found.
  */
 router.delete('/:id',
-    destroy)
+  destroy)
 
 export default router

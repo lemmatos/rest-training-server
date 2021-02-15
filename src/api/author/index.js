@@ -1,10 +1,11 @@
 import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
+import { password as passwordAuth, master, token } from '../../services/passport'
 import { create, index, show, update, destroy } from './controller'
 import { schema } from './model'
 export Author, { schema }
-from './model'
+  from './model'
 
 const router = new Router()
 const { first_name, last_name, birth_date, death_date, country } = schema.tree
@@ -23,8 +24,8 @@ const { first_name, last_name, birth_date, death_date, country } = schema.tree
  * @apiError 404 Author not found.
  */
 router.post('/',
-    body({ first_name, last_name, birth_date, death_date, country }),
-    create)
+  body({ first_name, last_name, birth_date, death_date, country }),
+  create)
 
 /**
  * @api {get} /authors Retrieve authors
@@ -35,10 +36,8 @@ router.post('/',
  * @apiError {Object} 400 Some parameters may contain invalid values.
  */
 router.get('/',
-    query(),
-    index)
-
-
+  query(),
+  index)
 
 /**
  * @api {get} /authors/:id Retrieve author
@@ -49,7 +48,7 @@ router.get('/',
  * @apiError 404 Author not found.
  */
 router.get('/:id',
-    show)
+  show)
 
 /**
  * @api {put} /authors/:id Update author
@@ -65,8 +64,8 @@ router.get('/:id',
  * @apiError 404 Author not found.
  */
 router.put('/:id',
-    body({ first_name, last_name, birth_date, death_date, country }),
-    update)
+  body({ first_name, last_name, birth_date, death_date, country }),
+  update)
 
 /**
  * @api {delete} /authors/:id Delete author
@@ -76,6 +75,7 @@ router.put('/:id',
  * @apiError 404 Author not found.
  */
 router.delete('/:id',
-    destroy)
+  token({ required: true, roles: ['admin'] }),
+  destroy)
 
 export default router

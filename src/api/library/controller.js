@@ -8,7 +8,7 @@ export const create = ({ bodymen: { body } }, res, next) =>
     .catch(next)
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
-  Library.find(query, select, cursor)
+  Library.find(query, select, cursor).populate({path: 'book', select: 'title'})
     .then((libraries) => libraries.map((library) => library.view()))
     .then(success(res))
     .catch(next)
