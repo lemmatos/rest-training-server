@@ -69,7 +69,7 @@ userSchema.methods = {
     let fields = ['id', 'name', 'picture']
 
     if (full) {
-      fields = [...fields, 'email', 'createdAt']
+      fields = [...fields, 'email', 'role', 'createdAt']
     }
 
     fields.forEach((field) => { view[field] = this[field] })
@@ -79,8 +79,21 @@ userSchema.methods = {
 
   authenticate (password) {
     return bcrypt.compare(password, this.password).then((valid) => valid ? this : false)
-  }
+  },
 
+  findLendings () {
+    const user = this
+    const Lending = mongoose.model('Lending')
+    return Lending.find({ lender: user.id })
+      .populate([{
+        path: 'book',
+        select: 'title'
+      },
+      {
+        path: 'lender',
+        select: 'name'
+      }])
+  }
 }
 
 userSchema.statics = {

@@ -2,9 +2,10 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { password as passwordAuth, master, token } from '../../services/passport'
-import { index, showMe, show, create, update, updatePassword, destroy } from './controller'
+import { index, showMe, show, create, update, updatePassword, destroy, lendingHistory, myLendingHistory, myLendingHistoryCount, userLendingHistory } from './controller'
 import { schema } from './model'
-export User, { schema } from './model'
+export User, { schema }
+from './model'
 
 const router = new Router()
 const { email, password, name, picture, role } = schema.tree
@@ -21,9 +22,14 @@ const { email, password, name, picture, role } = schema.tree
  * @apiError 401 Admin access only.
  */
 router.get('/',
-  token({ required: true, roles: ['admin'] }),
-  query(),
-  index)
+    token({ required: true, roles: ['admin'] }),
+    query(),
+    index)
+
+router.get('/lendings',
+    token({ required: true, roles: ["admin"] }),
+    query(),
+    lendingHistory)
 
 /**
  * @api {get} /users/me Retrieve current user
@@ -34,8 +40,19 @@ router.get('/',
  * @apiSuccess {Object} user User's data.
  */
 router.get('/me',
-  token({ required: true }),
-  showMe)
+    token({ required: true }),
+    showMe)
+
+router.get('/me/lendings',
+    token({ required: true }),
+    // query(),
+    myLendingHistory)
+
+// TODO
+// router.get('/me/lendings/count',
+//     token({ required: true }),
+//     query(),
+//     myLendingHistoryCount)
 
 /**
  * @api {get} /users/:id Retrieve user
@@ -46,7 +63,13 @@ router.get('/me',
  * @apiError 404 User not found.
  */
 router.get('/:id',
-  show)
+    show)
+
+
+// TODO
+router.get('/:id/lendings',
+    token({ required: true, roles: ["admin"] }),
+    userLendingHistory)
 
 /**
  * @api {post} /users Create user
@@ -65,9 +88,9 @@ router.get('/:id',
  * @apiError 409 Email already registered.
  */
 router.post('/',
-  master(),
-  body({ email, password, name, picture, role }),
-  create)
+    // master(),
+    body({ email, password, name, picture, role }),
+    create)
 
 /**
  * @api {put} /users/:id Update user
@@ -83,9 +106,9 @@ router.post('/',
  * @apiError 404 User not found.
  */
 router.put('/:id',
-  token({ required: true }),
-  body({ name, picture }),
-  update)
+    token({ required: true }),
+    body({ name, picture }),
+    update)
 
 /**
  * @api {put} /users/:id/password Update password
@@ -99,9 +122,11 @@ router.put('/:id',
  * @apiError 404 User not found.
  */
 router.put('/:id/password',
-  passwordAuth(),
-  body({ password }),
-  updatePassword)
+    passwordAuth(),
+    body({ password }),
+    updatePassword)
+
+
 
 /**
  * @api {delete} /users/:id Delete user
@@ -114,7 +139,10 @@ router.put('/:id/password',
  * @apiError 404 User not found.
  */
 router.delete('/:id',
-  token({ required: true, roles: ['admin'] }),
-  destroy)
+    token({ required: true, roles: ['admin'] }),
+    destroy)
+
+
+
 
 export default router

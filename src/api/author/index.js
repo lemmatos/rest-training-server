@@ -1,9 +1,11 @@
 import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
+import { password as passwordAuth, master, token } from '../../services/passport'
 import { create, index, show, update, destroy } from './controller'
 import { schema } from './model'
-export Author, { schema } from './model'
+export Author, { schema }
+  from './model'
 
 const router = new Router()
 const { first_name, last_name, birth_date, death_date, country } = schema.tree
@@ -73,6 +75,7 @@ router.put('/:id',
  * @apiError 404 Author not found.
  */
 router.delete('/:id',
+  token({ required: true, roles: ['admin'] }),
   destroy)
 
 export default router

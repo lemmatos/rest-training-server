@@ -16,8 +16,8 @@ const router = new Router()
  * @apiError 401 Master access only or invalid credentials.
  */
 router.post('/',
-  master(),
-  password(),
-  login)
+    // master(),
+    password(),
+    login)
 
 export default router

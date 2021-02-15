@@ -1,10 +1,14 @@
 import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
-import { create, index, show, update, destroy } from './controller'
+
+import { create, index, show, update, destroy, lend, returnBook, available, availableSoon } from './controller'
 import { schema } from './model'
-export Book, { schema }
-from './model'
+
+import { password as passwordAuth, master, token } from '../../services/passport'
+import mongoose, { Schema } from 'mongoose'
+
+export Book, { schema } from './model'
 
 const router = new Router()
 const { title, authors, year, isbn } = schema.tree
@@ -22,13 +26,31 @@ const { title, authors, year, isbn } = schema.tree
  * @apiError 404 Book not found.
  */
 router.post('/',
-    body({
-        title,
-        authors,
-        year,
-        isbn
-    }),
-    create)
+  body({
+    title,
+    authors,
+    year,
+    isbn
+  }),
+  create)
+
+router.post('/:id/lend',
+  token({ required: true, roles: ['admin'] }),
+  body({
+    lender: {
+      type: Schema.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    due_date: {
+      type: Date
+    }
+  }),
+  lend)
+
+router.post('/:id/return',
+  token({ required: true, roles: ['admin'] }),
+  returnBook)
 
 /**
  * @api {get} /books Retrieve books
@@ -39,8 +61,16 @@ router.post('/',
  * @apiError {Object} 400 Some parameters may contain invalid values.
  */
 router.get('/',
-    query(),
-    index)
+  query(),
+  index)
+
+router.get('/available', // TODO
+  query(),
+  available)
+
+router.get('/available-soon', // TODO
+  query(),
+  availableSoon)
 
 /**
  * @api {get} /books/:id Retrieve book
@@ -51,7 +81,7 @@ router.get('/',
  * @apiError 404 Book not found.
  */
 router.get('/:id',
-    show)
+  show)
 
 /**
  * @api {put} /books/:id Update book
@@ -66,13 +96,13 @@ router.get('/:id',
  * @apiError 404 Book not found.
  */
 router.put('/:id',
-    body({
-        title,
-        authors,
-        year,
-        isbn
-    }),
-    update)
+  body({
+    title,
+    authors,
+    year,
+    isbn
+  }),
+  update)
 
 /**
  * @api {delete} /books/:id Delete book
@@ -82,6 +112,7 @@ router.put('/:id',
  * @apiError 404 Book not found.
  */
 router.delete('/:id',
-    destroy)
+  token({ required: true, roles: ['admin'] }),
+  destroy)
 
 export default router

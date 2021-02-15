@@ -1,5 +1,9 @@
+import Promise from 'bluebird'
+
 import { success, notFound } from '../../services/response/'
 import { User } from '.'
+
+import mongoose from 'mongoose'
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   User.find(query, select, cursor)
@@ -15,7 +19,8 @@ export const show = ({ params }, res, next) =>
     .catch(next)
 
 export const showMe = ({ user }, res) =>
-  res.json(user.view(true))
+  Promise.delay(500)
+    .then(() => res.json(user.view(true)))
 
 export const create = ({ bodymen: { body } }, res, next) =>
   User.create(body)
@@ -81,4 +86,30 @@ export const destroy = ({ params }, res, next) =>
     .then(notFound(res))
     .then((user) => user ? user.remove() : null)
     .then(success(res, 204))
+    .catch(next)
+
+// TODO
+export const lendingHistory = ({ querymen: { query, select, cursor } }, res, next) =>
+  User.find({ role: ['user'] }, select, cursor)
+    .then(notFound(res))
+    .then((users) => users.map((user) => {
+      return {
+        userId: user.id,
+        userLentBooks: user.lentBooks
+      }
+    }))
+    .then(success(res))
+    .catch(next)
+
+export const myLendingHistory = ({ user }, res, next) =>
+  user.findLendings()
+    .then(success(res))
+    .catch(next)
+
+// TODO
+export const userLendingHistory = ({ params }, res, next) =>
+  User.findById(params.id)
+    .then(notFound(res))
+    .then((user) => user.findLendings())
+    .then(success(res))
     .catch(next)

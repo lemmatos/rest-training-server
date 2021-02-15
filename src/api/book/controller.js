@@ -8,7 +8,7 @@ export const create = ({ bodymen: { body } }, res, next) =>
     .catch(next)
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
-  Book.find(query, select, cursor)
+  Book.find(query, select, cursor).populate('authors')
     .then((books) => books.map((book) => book.view()))
     .then(success(res))
     .catch(next)
@@ -33,4 +33,30 @@ export const destroy = ({ params }, res, next) =>
     .then(notFound(res))
     .then((book) => book ? book.remove() : null)
     .then(success(res, 204))
+    .catch(next)
+
+export const lend = ({ bodymen: { body }, params }, res, next) =>
+  Book.findById(params.id)
+    .then(notFound(res))
+    .then((book) => book.lend(body.lender, body.due_date))
+    .then((lending) => lending ? lending.view(true) : null)
+    .then(success(res))
+    .catch(next)
+
+export const returnBook = ({ params }, res, next) =>
+  Book.findById(params.id)
+    .then(notFound(res))
+    .then((book) => book.returnBook())
+    .then((lending) => lending ? lending.view(true) : null)
+    .then(success(res))
+    .catch(next)
+
+export const available = (req, res, next) =>
+  Book.available()
+    .then(success(res))
+    .catch(next)
+
+export const availableSoon = (req, res, next) =>
+  Book.availableSoon()
+    .then(success(res))
     .catch(next)

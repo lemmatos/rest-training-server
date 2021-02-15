@@ -1,12 +1,18 @@
 import mongoose, { Schema } from 'mongoose'
 
-const librarySchema = new Schema({
-  book: {
+const bookmarkSchema = new Schema({
+  creator: {
     type: Schema.ObjectId,
-    ref: 'Book',
+    ref: 'User',
     required: true
   },
-  section: {
+  name: {
+    type: String
+  },
+  size: {
+    type: String
+  },
+  color: {
     type: String
   }
 }, {
@@ -17,13 +23,15 @@ const librarySchema = new Schema({
   }
 })
 
-librarySchema.methods = {
+bookmarkSchema.methods = {
   view (full) {
     const view = {
       // simple view
       id: this.id,
-      book: this.book.title,
-      section: this.section,
+      creator: this.creator.view(full),
+      name: this.name,
+      size: this.size,
+      color: this.color,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }
@@ -35,7 +43,7 @@ librarySchema.methods = {
   }
 }
 
-const model = mongoose.model('Library', librarySchema)
+const model = mongoose.model('Bookmark', bookmarkSchema)
 
 export const schema = model.schema
 export default model
