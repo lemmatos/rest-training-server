@@ -56,7 +56,6 @@ export const available = (req, res, next) =>
     .then(success(res))
     .catch(next)
 
-// TODO
 export const availableSoon = (req, res, next) =>
   Book.availableSoon()
     .then(success(res))
